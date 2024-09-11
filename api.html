@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses List</title>
+    <link rel="stylesheet" href="styling.css">
+    <style>
+        .pagination {
+            margin: 20px 0;
+        }
+        .pagination button {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Available Courses</h1>
+    
+    <!-- Sorting Controls -->
+    <div id="sortingControls">
+        <label for="sortBy">Sort by:</label>
+        <select id="sortBy">
+            <option value="title">Title</option>
+            <option value="rating">Rating</option>
+        </select>
+        <label for="sortOrder">Order:</label>
+        <select id="sortOrder">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+    
+    <div id="courses"></div>
+    
+    <div class="pagination">
+        <button id="prevPage">Previous</button>
+        <span id="pageInfo"></span>
+        <button id="nextPage">Next</button>
+    </div>
+
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 3;
+
+        function fetchCourses(page, sortBy, sortOrder) {
+            fetch(`http://localhost:3000/courses?page=${page}&limit=${itemsPerPage}&sortBy=${sortBy}&sortOrder=${sortOrder}`)
+                .then(response => response.json())
+                .then(data => {
+                    const coursesDiv = document.getElementById('courses');
+                    coursesDiv.innerHTML = ''; // Clear previous content
+                    data.courses.forEach(course => {
+                        const courseItem = document.createElement('div');
+                        courseItem.innerHTML = `<h2>${course.title}</h2>
+                                                <p>CourseId: ${course.courseId}</p>
+                                                <p>Instructor: ${course.instructor}</p>
+                                                <p>Duration: ${course.duration}</p>
+                                                <p>Rating: ${course.rating}</p>`;
+                        coursesDiv.appendChild(courseItem);
+                    });
+                    document.getElementById('pageInfo').innerText = `Page ${currentPage}`;
+                    document.getElementById('prevPage').disabled = currentPage === 1;
+                    document.getElementById('nextPage').disabled = !data.hasMore;
+                })
+                .catch(error => console.error('Error fetching courses:', error));
+        }
+
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchCourses(currentPage, getSortBy(), getSortOrder());
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            currentPage++;
+            fetchCourses(currentPage, getSortBy(), getSortOrder());
+        });
+
+        document.getElementById('sortBy').addEventListener('change', () => {
+            fetchCourses(currentPage, getSortBy(), getSortOrder());
+        });
+
+        document.getElementById('sortOrder').addEventListener('change', () => {
+            fetchCourses(currentPage, getSortBy(), getSortOrder());
+        });
+
+        function getSortBy() {
+            return document.getElementById('sortBy').value;
+        }
+
+        function getSortOrder() {
+            return document.getElementById('sortOrder').value;
+        }
+
+        // Fetch the first page initially
+        fetchCourses(currentPage, getSortBy(), getSortOrder());
+
+        // Handle form submission
+        document.getElementById('signupForm').addEventListener('submit', event => {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            fetch('http://localhost:3000/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Signup successful');
+                document.getElementById('signupForm').reset();
+            })
+            .catch(error => console.error('Error signing up:', error));
+        });
+    </script>
+</body>
+</html>

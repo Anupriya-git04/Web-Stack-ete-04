@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Courses (JSON)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Online Courses</h1>
+
+  <div class="filter">
+    <input type="text" id="searchInput" placeholder="Search courses...">
+    <select id="sortSelect">
+      <option value="title">Title</option>
+      <option value="rating">Rating</option>
+      <option value="price">Price</option>
+    </select>
+  </div>
+
+  <div id="courseContainer"></div>
+
+  <!-- Pagination controls -->
+  <div class="pagination">
+    <button id="prevPage" disabled>Previous</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="nextPage">Next</button>
+  </div>
+
+  <h2>Sign up for a Course</h2>
+  <form id="signupForm">
+    <input type="text" id="name" placeholder="Your Name" required>
+    <input type="email" id="email" placeholder="Your Email" required>
+    <select id="courseSelect" required></select>
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script src="script_json.js"></script>
+</body>
+</html>
